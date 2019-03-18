@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>Step02_example.html</title>
+   <style>
+      canvas{
+         border: 1px solid red;
+      }
+   </style>
+</head>
+<body>
+<canvas id="myCanvas" width="800" height="500"></canvas>
+<script src="js/jquery-3.3.1.js"></script>
+<script>
+   //캔버스 요소의 참조값을 얻어와서
+   var canvas=document.querySelector("#myCanvas");
+   //캔버스에 렌더링할 context 참조값 얻어오기
+   var context=canvas.getContext("2d");
+
+   //배경 이미지 로딩하기
+   var backImg=new Image();
+   backImg.src="images/background.jpg";
+
+   //토끼 이미지 두개 로딩해서 배열에 담기
+   var rabbit1=new Image();
+   var rabbit2=new Image();
+   rabbit1.src="images/rabbit_1.png";
+   rabbit2.src="images/rabbit2.png";
+   var rabbitImgs=[rabbit1, rabbit2];
+
+   //토끼의 좌표
+   var rabbitX=400, rabbitY=250;
+
+   //토끼 이미지 인덱스(0, 1 왔다갔다 할 인덱스)
+   var rabbitIndex=0;
+
+   //카운트를 셀 변수
+   var count=0;
+
+   //스나이프 이미지 로딩하기
+   var snipeImg=new Image();
+   snipeImg.src="images/snipe.png";
+
+   //스나이프의 좌표
+   var snipeX=0, snipeY=0;
+
+   //총알 구멍 이미지 로딩하기
+   var holeImg=new Image();
+   holeImg.src="images/hole.png";
+
+   //총알 구멍의 좌표(plain object)를 누적시킬 배열
+   var holes=[];
+
+   //총소리 로딩하기
+   var fireSound=new Audio("sounds/fire.wav");
+
+   //비명소리 로딩하기
+   var screamSound=new Audio("sounds/birddie.mp3");
+
+
+
+   reautoX=Math.floor(Math.random()*730)+30;
+   reautoY=Math.floor(Math.random()*430)+30;
+
+   autoX=Math.floor(Math.random()*730)+30;
+   autoY=Math.floor(Math.random()*430)+30;
+
+
+
+   kill=false
+
+   setInterval(function(){
+         //배경이미지 그리기
+      context.drawImage(backImg, 0, 0, 800, 500);
+      //반복문 돌면서 총알 구멍 이미지 그리기
+      for(var i=0; i<holes.length;i++){
+         //i번째 방에 있는 총알 구멍 정보 object를 얻어온다
+         var tmp=holes[i];
+         //tmp에 있는 좌표를 이용해서 총알 구멍 그리기
+         context.drawImage(holeImg, tmp.x-10, tmp.y-10, 20, 20);
+      };
+
+      //카운트를 1 증가 시킨다.
+      count++;
+      //토끼 애니메이션 
+      rabbitAni();
+      //스나이프 이미지 그리기
+      context.drawImage(snipeImg, snipeX-50, snipeY-50, 100, 100);
+
+      if(!kill){
+         context.drawImage(rabbitImgs[rabbitIndex], autoX-50, autoY-50, 100, 100);
+      }else if(kill){
+         context.drawImage(rabbitImgs[rabbitIndex], reautoX-50, reautoY-50, 100, 100);
+      };
+
+   }, 10);
+
+   function rabbitAni(){
+      if(count%20 == 0){
+         rabbitIndex++;
+         if(rabbitIndex==2){
+            rabbitIndex=0;
+         }
+      }
+   }
+   //mousemove 이벤트 처리, 스나이프 그림이 마우스를 따라오게
+   $("#myCanvas").on("mousemove", function(e){
+      //마우스의 좌표를 스나이프의 좌표에 반영한다.
+      snipeX=e.offsetX;
+      snipeY=e.offsetY;
+   });
+
+   //mousedown 이벤트 처리 (클릭했을 때 총알그림 보이게)
+   //mousedown 이벤트가 일어날 때마다 obj가 생기고 x좌표와 y좌표가 오브젝트 배열에 누적됨
+   $("#myCanvas").on("mousedown", function(e){
+      //총알 구멍의 좌표를 담을 object
+      var obj={};
+      // x, y라는 방에 x좌표와 y좌표를 담는다.
+      obj.x=e.offsetX;
+      obj.y=e.offsetY;
+      console.log(e.offsetX);
+      console.log(e.offsetY);
+
+      //위 3개 코드와 같음 var obj={x:e.offsetX, y:e.offsetY};
+
+      //배열에 누적시키기
+      holes.push(obj);
+
+      //총소리 내기
+      fireSound.currentTime=0; //재생 위치를 강제로 0으로 하면 총소리가 끝난 후에 소리가 나는 대신, 연속 소리가 가능함
+      fireSound.play();
+
+   });
+
+   $("#myCanvas").on("mousedown", function(){
+      if((autoX-30<snipeX) && (autoX+30>snipeX) && (autoY-30<snipeY) && (autoY+30>snipeY)){
+         screamSound.play();
+         screamSound.currentTime=0;
+         kill=true;
+      // }else if((reautoX-30<snipeX) && (reautoX+30>snipeX) && (reautoY-30<snipeY) && (reautoY+30>snipeY)){
+      //    screamSound.play();
+      //    screamSound.currentTime=0;
+      //    kill=false;
+      };
+   });   
+
+</script>   
+</body>
+</html>
