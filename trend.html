@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body onLoad="scrollTrend()">
+<form name="myForm">
+	<table>
+		<tr>
+			<h3> IT 트랜드 Issue</h3>
+			<td><input type="text" name="trend" size="100" style="background-color: yellow" onMouseover="stopTrend()" onMouseout="scrollTrend()">
+			</td>
+		</tr>
+	</table>
+</form>
+<script type="text/javascript">
+		var msg="4차 산업혁명 '태풍이 물려온다. 인공지능, 빅데이터, iot, 로봇공학, 나노기술,무인운송수단,3D프린트"
+
+		// 시나리오 1
+		for(i=0; i<60; i++){
+			msg = " " + msg 
+		}
+
+		function scrollTrend(){
+		// 시나리오 2 - string 객체의 substring(매개변수1, 매개변수2) 함수 적용 
+			document.myform.trend.value = msg.substring(0,59);
+			msg = msg.substring(1,msg.length)+msg.substring(0,1);
+			timeout= setTimeout("scrollTrend()",100);
+
+		}
+
+		function stopTrend(){
+			clearTimeout(timeout);
+		}
+	</script>
+</body>
+</html>
